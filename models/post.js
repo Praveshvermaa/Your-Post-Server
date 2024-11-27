@@ -16,10 +16,9 @@ const postSchema = new mongoose.Schema({
         type:Date,
         default:Date.now
     },
-    like:{
-        type:Number,
-        default:0
-    }
+   public_id:{
+    type:'String',
+   }
 })
 const post = mongoose.model("post",postSchema)
 module.exports = post;

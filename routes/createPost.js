@@ -8,25 +8,31 @@ const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
 const { error } = require('console');
+const cloudinary = require('cloudinary').v2;
 //route to create new user post
 router.post('/upload',upload.single("postImage"),verifyToken, async (req,res)=>{
     try {
-        const {postImage,postCaption} = req.body;
+        const {postCaption} = req.body;
        
         const loginuser = await user.findById(req.user.userid);
+        const imageUrl = req.file.path;
+       console.log("image is uploaded successfully", imageUrl);
        
         const newpost = new post({
             userId:loginuser._id,
-            postImage:`/images/${req.file.filename}`,
+            postImage:imageUrl,
             postCaption:postCaption,
+            public_id:req.file.filename,
 
         })
+        
+        
         await newpost.save();
         loginuser.posts.push(newpost._id);
         await loginuser.save();
        
         
-        res.json({success:true})
+       return res.json({success:true})
 
 
     } catch (error) {
@@ -43,7 +49,10 @@ router.post("/editpicture",upload.single('profileImage'),verifyToken,async(req,r
         if(!loginuser){
             return res.json({success:false})
         }
-        loginuser.profile_picture = `/images/${req.file.filename}`;
+        const imageUrl = req.file.path;
+        console.log(imageUrl);
+        
+        loginuser.profile_picture = imageUrl;
         await loginuser.save();
         res.json({user:loginuser,success:true})
     } catch (error) {
@@ -71,20 +80,16 @@ router.post("/deletePost",verifyToken,async(req,res)=>{
         if (!postToDelete) {
             return res.json({success:false,message:"Post is not found"})
         }
-        const imagePath = postToDelete.postImage;
-        console.log(imagePath);
+        const result = await cloudinary.uploader.destroy(postToDelete.public_id);
+        if (result.result === "ok") {
+           console.log("Image deleted successfully");
+          
+        } else {
+            res.status(404).json({ message: "Image not found" });
+        }
+         
+       
 
-        const filePath = path.join(__dirname,'..',imagePath);
-        fs.unlink(filePath,(err)=>{
-            if(err){
-                console.log(error);
-                
-            }
-            else{
-                console.log("Image file deleted successfully");
-                
-            }
-        })
         const updateduser = await user.findByIdAndUpdate(
             req.user.userid,
             { $pull: { posts: id } },
@@ -98,11 +103,11 @@ router.post("/deletePost",verifyToken,async(req,res)=>{
       
       
 
-      res.json({updateduser,success:true});
+     return res.json({updateduser,success:true});
 
     } catch (error) {
         console.log(error);
-        res.json({success:false});
+       return  res.json({success:false});
     }
 })
 module.exports = router;
