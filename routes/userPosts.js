@@ -2,7 +2,9 @@ const express = require('express')
 const router = express.Router();
 const user = require('../models/userSchema')
 const verifyToken = require("../middileware/verifyToken")
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const { route } = require('./comment');
+const User = require('../models/userSchema');
 const ObjectId = mongoose.Types.ObjectId;
 //routes for fetch all posts those are uploaded by user
 router.get('/userposts',verifyToken,async (req,res)=>{
@@ -41,5 +43,15 @@ router.post('/profileveiwer',verifyToken,async(req,res)=>{
     
   }
  
+
+})
+router.get('/dashboard/usersposts',verifyToken,async(req,res)=>{
+  try {
+    const user = await User.findById(req.user.userid).populate("posts");
+    if(!user) return res.status(404).json({message:"user is not found"});
+    res.status(201).json({success:true,user});
+  } catch (error) {
+    console.log(error); 
+  }
 })
 module.exports = router;

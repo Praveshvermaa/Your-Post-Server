@@ -6,7 +6,7 @@ const userdetails = require('./routes/userDeatils')
 const createPost = require('./routes/createPost')
 const userposts = require('./routes/userPosts');
 const path = require('path')
-const aigenerator = require('./routes/Dalle')
+const comment = require("./routes/comment")
 
 const app= express();
 const port = process.env.PORT||4000;
@@ -19,7 +19,7 @@ app.use('/api/auth',router)
 app.use('/api',userdetails)
 app.use('/api',createPost)
 app.use('/api',userposts)
-app.use('/api',aigenerator)
+app.use('/api',comment)
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.get('/',(req,res)=>{

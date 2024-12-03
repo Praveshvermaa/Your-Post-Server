@@ -9,10 +9,14 @@ const path = require('path');
 const fs = require('fs');
 const { error } = require('console');
 const cloudinary = require('cloudinary').v2;
+const Sentiment = require('sentiment');
+const sentiment = new Sentiment();
 //route to create new user post
 router.post('/upload',upload.single("postImage"),verifyToken, async (req,res)=>{
     try {
         const {postCaption} = req.body;
+        const result = sentiment.analyze(postCaption);
+
        
         const loginuser = await user.findById(req.user.userid);
         const imageUrl = req.file.path;
@@ -23,7 +27,11 @@ router.post('/upload',upload.single("postImage"),verifyToken, async (req,res)=>{
             postImage:imageUrl,
             postCaption:postCaption,
             public_id:req.file.filename,
-
+            comments:{
+                text:postCaption,
+                user:loginuser.username,
+            },
+            sentimentScore:result.score,
         })
         
         
@@ -62,7 +70,7 @@ router.post("/editpicture",upload.single('profileImage'),verifyToken,async(req,r
 //routes for fetch all posts that eixts in database post model
 router.get("/allposts", async (req,res)=>{
     try {
-        const allpost = await post.find().sort({ CreatedAt: -1 }).populate("userId");
+        const allpost = await post.find().sort( { sentimentScore: -1 }).populate("userId");
         res.json({success:true,posts:allpost})
     } catch (error) {
         console.log(error);
