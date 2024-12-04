@@ -7,6 +7,9 @@ const createPost = require('./routes/createPost')
 const userposts = require('./routes/userPosts');
 const path = require('path')
 const comment = require("./routes/comment")
+const axios = require('axios');
+
+
 
 const app= express();
 const port = process.env.PORT||4000;
@@ -26,6 +29,13 @@ app.get('/',(req,res)=>{
    
 res.send("hey! server is running ")
 })
+  
+setInterval(() => {
+  axios.get('https://your-post-backend.onrender.com') // Replace with your endpoint
+    .then(() => console.log('Server kept alive'))
+    .catch((err) => console.error('Error keeping server alive:', err));
+}, 300000); // Ping every 5 minutes
+
 app.listen(port,()=>{
     console.log(`server is running on ${port}`);
 })
