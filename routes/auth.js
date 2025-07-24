@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
 
-router.post('/register',async(req,res)=>{
+router.post('/register',async (req,res)=>{
     try {
         const {username,name,email,password} = req.body;
         const salt = await bcrypt.genSalt(10);

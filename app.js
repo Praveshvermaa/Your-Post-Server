@@ -31,7 +31,7 @@ res.send("hey! server is running ")
 })
   
 setInterval(() => {
-  axios.get('https://your-post-backend.onrender.com') // Replace with your endpoint
+  axios.get('https://your-post-backend.onrender.com')
     .then(() => console.log('Server kept alive'))
     .catch((err) => console.error('Error keeping server alive:', err));
 }, 300000); // Ping every 5 minutes
