@@ -11,32 +11,35 @@ const axios = require('axios');
 
 
 
-const app= express();
-const port = process.env.PORT||4000;
+const app = express();
+const port = process.env.PORT || 4000;
 connection();
 const cors = require('cors');
-app.use(cors());
+app.use(cors({
+  origin: ["https://your-post-client.vercel.app/", 'http://localhost:5173', 'http://127.0.0.1:5173'], // Vite's default dev port
+  credentials: true,
+}));
 
 app.use(express.json());
-app.use('/api/auth',router)
-app.use('/api',userdetails)
-app.use('/api',createPost)
-app.use('/api',userposts)
-app.use('/api',comment)
+app.use('/api/auth', router)
+app.use('/api', userdetails)
+app.use('/api', createPost)
+app.use('/api', userposts)
+app.use('/api', comment)
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-app.get('/',(req,res)=>{
-   
-res.send("hey! server is running ")
+app.get('/', (req, res) => {
+
+  res.send("hey! server is running ")
 })
-  
+
 setInterval(() => {
   axios.get('https://your-post-backend.onrender.com')
     .then(() => console.log('Server kept alive'))
     .catch((err) => console.error('Error keeping server alive:', err));
 }, 300000); // Ping every 5 minutes
 
-app.listen(port,()=>{
-    console.log(`server is running on ${port}`);
+app.listen(port, () => {
+  console.log(`server is running on ${port}`);
 })
 
